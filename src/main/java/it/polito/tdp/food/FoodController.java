@@ -5,8 +5,10 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import it.polito.tdp.food.model.Model;
+import it.polito.tdp.food.model.PorzionePeso;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -40,29 +42,57 @@ public class FoodController {
     private Button btnCammino; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxPorzioni"
-    private ComboBox<?> boxPorzioni; // Value injected by FXMLLoader
+    private ComboBox<String> boxPorzioni; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
 
     @FXML
     void doCammino(ActionEvent event) {
-    	txtResult.clear();
-    	txtResult.appendText("Cerco cammino peso massimo...");
+    	try {
+    		Integer N = Integer.parseInt(txtPassi.getText());
+    		if(N<1)
+    			throw new NumberFormatException();
+    		if(boxPorzioni.getValue()!=null) {
+    			List<String> cammino = model.cammino(boxPorzioni.getValue(), N);
+    			if(cammino==null)
+    				txtResult.setText("Cammino non trovato");
+    			else {
+    				txtResult.setText("Cammino: ");
+	    			for(String s : cammino)
+	    				txtResult.appendText("\n" + s);
+	    			txtResult.appendText("\nPeso cammino = " + model.getPesoCammino());
+    			}
+    		}
+    	} catch (NumberFormatException e) {
+    		e.printStackTrace();
+    		txtResult.setText("Inserimento non valido");
+    	};
     }
 
     @FXML
     void doCorrelate(ActionEvent event) {
-    	txtResult.clear();
-    	txtResult.appendText("Cerco porzioni correlate...");
-    	
+    	if(boxPorzioni.getValue()!=null) {
+    		txtResult.setText(boxPorzioni.getValue().toString() + " PORZIONI CORRELATE:");
+    		for(PorzionePeso p : model.getViciniPesi(boxPorzioni.getValue()))
+    			txtResult.appendText("\n" + p.toString());
+    	} else {
+    		txtResult.setText("Seleziona un tipo di porzione");
+    	}  	
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-    	txtResult.clear();
-    	txtResult.appendText("Creazione grafo...");
-    	
+    	try {
+    		Double calorie = Double.parseDouble(txtCalorie.getText());
+    		model.creaGrafo(calorie);
+    		boxPorzioni.getItems().clear();
+    		boxPorzioni.getItems().addAll(model.getVertici());
+    		txtResult.setText("Grafo creato con " + model.getVertici().size() + " vertici e " +  model.getNumArchi() + " archi");
+    	} catch (NumberFormatException e) {
+    		e.printStackTrace();
+    		txtResult.setText("Inserimento non valido");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete

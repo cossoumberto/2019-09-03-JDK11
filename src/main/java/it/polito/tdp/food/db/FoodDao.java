@@ -7,11 +7,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import it.polito.tdp.food.model.Condiment;
+import it.polito.tdp.food.model.CoppiaPorzioni;
 import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Portion;
 
 public class FoodDao {
-	public List<Food> listAllFoods(){
+	/*public List<Food> listAllFoods(){
 		String sql = "SELECT * FROM food" ;
 		try {
 			Connection conn = DBConnect.getConnection() ;
@@ -107,8 +108,49 @@ public class FoodDao {
 			return null ;
 		}
 
+	}*/
+	
+	public List<String> getNomiPorzioniMaxCalorie(Double calorie){
+		String sql = "SELECT DISTINCT portion_display_name AS n FROM porzioni WHERE calories<?";
+		List<String> list = new ArrayList<>();
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setDouble(1, calorie);
+			ResultSet res = st.executeQuery();
+			while(res.next()) {
+				list.add(res.getString("n").toLowerCase());
+			} 
+			conn.close();
+			return list;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null ;
+		}
 	}
 	
-	
+	public List<CoppiaPorzioni> listCoppiePorzioni(Double calorie){
+		String sql = "SELECT DISTINCT p1.portion_display_name AS n1, p2.portion_display_name AS n2, COUNT(p1.food_code) AS c " +				
+					"FROM porzioni AS p1, porzioni AS p2 " +
+					"WHERE p1.calories<? AND p2.calories<? " +
+					"AND p1.food_code=p2.food_code AND p1.portion_display_name>p2.portion_display_name " +
+					"GROUP BY p1.portion_display_name, p2.portion_display_name";
+		List<CoppiaPorzioni> list = new ArrayList<>();
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setDouble(1, calorie);
+			st.setDouble(2, calorie);
+			ResultSet res = st.executeQuery();
+			while(res.next()) {
+				list.add(new CoppiaPorzioni(res.getString("n1").toLowerCase(), res.getString("n2").toLowerCase(), res.getInt("c")));
+			} 
+			conn.close();
+			return list;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null ;
+		}
+	}
 
 }
