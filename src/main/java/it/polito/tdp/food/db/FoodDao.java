@@ -131,7 +131,7 @@ public class FoodDao {
 	
 	public List<CoppiaPorzioni> listCoppiePorzioni(Double calorie){
 		String sql = "SELECT DISTINCT p1.portion_display_name AS n1, p2.portion_display_name AS n2, COUNT(p1.food_code) AS c " +				
-					"FROM porzioni AS p1, porzioni AS p2 " +
+					"FROM porzioni AS p1, porzioni AS p2 " +										//NELLA SOL AGGUNGE DISTINCT p1.food_code
 					"WHERE p1.calories<? AND p2.calories<? " +
 					"AND p1.food_code=p2.food_code AND p1.portion_display_name>p2.portion_display_name " +
 					"GROUP BY p1.portion_display_name, p2.portion_display_name";

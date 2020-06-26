@@ -25,13 +25,8 @@ public class Model {
 	public void creaGrafo(Double calorie) {
 		grafo = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
 		Graphs.addAllVertices(grafo, dao.getNomiPorzioniMaxCalorie(calorie));
-		for(CoppiaPorzioni cp : dao.listCoppiePorzioni(calorie)) {
-			if(!grafo.vertexSet().contains(cp.getP1()))
-				System.out.println(cp.getP1());
-			if(!grafo.vertexSet().contains(cp.getP1()))
-				System.out.println(cp.getP1());
+		for(CoppiaPorzioni cp : dao.listCoppiePorzioni(calorie)) 
 			Graphs.addEdge(grafo, cp.getP1(), cp.getP2(), cp.getPeso());
-		}
 	}
 	
 	public List<String> getVertici(){
@@ -62,7 +57,7 @@ public class Model {
 	}
 
 	private void cerca(List<String> parziale, int peso, Integer N) {
-		if(parziale.size()==N) {
+		if(parziale.size()==N) {//ERRORE parziale.size()==N+1 --> sono richiesti N passi (archi)
 			if(peso>bestPeso) {
 				bestCammino = new ArrayList<>(parziale);
 				bestPeso = peso;
